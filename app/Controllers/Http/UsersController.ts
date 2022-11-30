@@ -1,45 +1,83 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from '../../Models/User';
-import { schema } from '@ioc:Adonis/Core/Validator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
+import Mail from '@ioc:Adonis/Addons/Mail';
+import Route from '@ioc:Adonis/Core/Route'
 export default class UsersController {
-
-    public async index ({ request, response }: HttpContextContract) {
-        const users = await User.all();
-        return response.json(users);
-    }
     
-    public async register ({ request, response }: HttpContextContract) {
+    public async register ({ request }: HttpContextContract) {
         const payload = await request.validate({
             schema: schema.create({
                 name: schema.string(),
-                email: schema.string(),
+                email: schema.string([
+                    rules.email(),
+                    rules.unique({ table: 'users', column: 'email' }),
+                ]),
                 password: schema.string(),
-                phone_number: schema.string(),
+                phone_number: schema.string([
+                    rules.maxLength(10),
+                    rules.minLength(9),
+                ]),
               
             })
         })
         payload.password = await Hash.make(payload.password);
-       
-
-
 
         const user = await User.create(payload);
-        return response.json(user);
+
+        const url = Route.makeSignedUrl('verifyEmail', 
+          {
+            user: user.id,
+          },
+          {
+            prefixUrl: 'http://localhost:3333'
+          
+          });
+        
+
+
+        await Mail.use('smtp').sendLater( message => {
+            
+            message
+                .from("caesarnetyet@gmail.com")
+                .to(user.email)
+                .subject("Welcome my good friend")
+                .htmlView('emails/welcome', {name: user.name, url: url})
+        });
+        return {message: "Email sent", user};
     }
 
     public async login ({ request, response, auth }: HttpContextContract) {
+
         const email = request.input('email');
+
         const password = request.input('password');
+
         const token = await auth.use('api').attempt(email, password);
+
         return response.json(token);
     }
     
     
-    public async show ({ params, request, response }: HttpContextContract) {
-        const user = await User.findOrFail(params.id);
-        return response.json(user);
+    public async show ({auth}) {
+
+        const { user } =  auth;
+
+        return {message: "Email sent", user};
     }
+
+
+    public async verifyEmail({request, params, response }: HttpContextContract) {
+        if (!request.hasValidSignature()) {
+            return "Invalid or expired URL";
+          }
+        const user = await User.findOrFail(params.user);
+        user.is_active = true;
+        await user.save();
+        return response.json({message: "Email verified"});
+    }
+
     
     public async update ({ params, request, response }: HttpContextContract) {
         const user = await User.findOrFail(params.id);
@@ -49,9 +87,5 @@ export default class UsersController {
         return response.json(user);
     }
     
-    public async destroy ({ params, request, response }: HttpContextContract) {
-        const user = await User.findOrFail(params.id);
-        await user.delete();
-        return response.json(user);
-    }
+   
 }

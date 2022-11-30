@@ -25,6 +25,19 @@ Route.get('/', async () => {
 })
 
 
-Route.get('/user', 'UsersController.index');
-Route.post('/user/register', 'UsersController.register')
-Route.post('/user/login', 'UsersController.login')
+
+Route.group(() => {
+  Route.get('verify/:user', 'UsersController.verifyEmail').as('verifyEmail');
+  Route.post('/register', 'UsersController.register')
+  Route.post('/login', 'UsersController.login')
+  Route.group(()=> {
+    Route.get('/', 'UsersController.show');
+    Route.put('/update', 'UsersController.update');
+    Route.delete('/delete', 'UsersController.destroy');
+  }).middleware('auth:api')
+   
+}).prefix('user');
+
+
+//Signed URL
+
