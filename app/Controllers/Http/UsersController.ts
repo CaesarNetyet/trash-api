@@ -23,6 +23,7 @@ export default class UsersController {
             })
         })
         payload.password = await Hash.make(payload.password);
+        
 
         const user = await User.create(payload);
 
@@ -56,7 +57,10 @@ export default class UsersController {
 
         const token = await auth.use('api').attempt(email, password);
 
-        return response.json(token);
+        return {status:201,
+            token: token.token,
+            user: token.user
+            };
     }
     
     

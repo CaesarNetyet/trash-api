@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.string('email', 255).notNullable().unique()
       table.string('password', 180).notNullable()
       table.string('phone_number', 10).notNullable()
-      table.integer('role_id').unsigned().references('id').inTable('roles').onDelete('CASCADE')
+      table.integer('role_id').unsigned().references('id').inTable('roles').onDelete('CASCADE').defaultTo(3)
       table.boolean('is_active').defaultTo(false)
       table.string('remember_me_token').nullable()
       /**
