@@ -41,7 +41,7 @@ export default class UsersController {
             user: user.id,
           },
           {
-            prefixUrl: 'http://localhost:3333'
+            prefixUrl: 'http://trash-api.me:3333'
           
           });
 

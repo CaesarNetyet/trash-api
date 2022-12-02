@@ -21,7 +21,22 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/', async () => {
-  return { hello: 'world' }
+  return { '/user': {
+    '/register': {
+      "name": "string",
+      "email": "string",
+      "password": "string",
+      "phone_number": "string (10 digits)"
+    },
+    '/login': {
+      "email": "string",
+      "password": "string"
+    },
+    '/update': {
+      "id": "number"
+    }
+
+  }}
 })
 
 
