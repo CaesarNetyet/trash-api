@@ -27,7 +27,7 @@ Route.get('/', async () => {
 
 
 Route.group(() => {
-  Route.get('verify/:user', 'UsersController.verifyEmail').as('verifyEmail');
+  Route.post('verify/:user', 'UsersController.verify').as('verify');
   Route.post('/register', 'UsersController.register')
   Route.post('/login', 'UsersController.login')
   Route.group(()=> {
@@ -37,7 +37,7 @@ Route.group(() => {
   }).middleware('auth:api')
    
 }).prefix('user');
-
+Route.post('/testverification', 'UsersController.testVerification');
 
 //Signed URL
 

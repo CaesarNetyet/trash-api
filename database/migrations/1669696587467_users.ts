@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.string('phone_number', 10).notNullable()
       table.integer('role_id').unsigned().references('id').inTable('roles').onDelete('CASCADE').defaultTo(3)
       table.boolean('is_active').defaultTo(false)
+      table.string('code').nullable()
       table.string('remember_me_token').nullable()
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

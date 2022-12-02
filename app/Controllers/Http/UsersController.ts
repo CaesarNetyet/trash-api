@@ -2,11 +2,16 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from '../../Models/User';
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
-import Mail from '@ioc:Adonis/Addons/Mail';
 import Route from '@ioc:Adonis/Core/Route'
+import sendTwilioMessage from '../../../config/messages';
 export default class UsersController {
+
     
-    public async register ({ request }: HttpContextContract) {
+    
+    public async register ({auth, request, response }: HttpContextContract) {
+
+        const randomCode: number = Math.floor(100000 + Math.random() * 900000);
+
         const payload = await request.validate({
             schema: schema.create({
                 name: schema.string(),
@@ -24,10 +29,14 @@ export default class UsersController {
         })
         payload.password = await Hash.make(payload.password);
         
+        const [messageRequest, error] = await sendTwilioMessage(`Your verification code is ${randomCode}`, payload.phone_number);
 
+        if (error) {
+            return response.status(403).json({message: "Error sending message", error});
+        }
         const user = await User.create(payload);
-
-        const url = Route.makeSignedUrl('verifyEmail', 
+        
+        const url = Route.makeSignedUrl('verify', 
           {
             user: user.id,
           },
@@ -35,18 +44,14 @@ export default class UsersController {
             prefixUrl: 'http://localhost:3333'
           
           });
-        
 
+          
 
-        await Mail.use('smtp').sendLater( message => {
-            
-            message
-                .from("caesarnetyet@gmail.com")
-                .to(user.email)
-                .subject("Welcome my good friend")
-                .htmlView('emails/welcome', {name: user.name, url: url})
-        });
-        return {message: "Email sent", user};
+            user.code = randomCode;
+            await user.save();
+            const token = await auth.use('api').generate(user)
+            return {status:201, token: token.token, url: url, messageRequest}     
+
     }
 
     public async login ({ request, response, auth }: HttpContextContract) {
@@ -59,6 +64,7 @@ export default class UsersController {
 
         return {status:201,
             token: token.token,
+            role: token.user.role_id,
             user: token.user
             };
     }
@@ -68,21 +74,32 @@ export default class UsersController {
 
         const { user } =  auth;
 
-        return {message: "Email sent", user};
+        return { user};
     }
 
 
-    public async verifyEmail({request, params, response }: HttpContextContract) {
+    public async verify({request, params, response }: HttpContextContract) {
         if (!request.hasValidSignature()) {
             return "Invalid or expired URL";
           }
         const user = await User.findOrFail(params.user);
+     
+        if(request.input('code') != user.code) return response.status(403).json({message: "Invalid code"});
         user.is_active = true;
         await user.save();
-        return response.json({message: "Email verified"});
+        return response.status(201).json({status:201,message: "Phone number verified"});
     }
 
-    
+    public async testVerification({response}){
+        const [messageRequest, error] = await sendTwilioMessage("Wenas", "8139895086");
+
+        if (error) {
+            return response.status(403).json({message: "Error sending message", error});
+        }
+
+     return response.json({messageRequest});
+
+    }
     public async update ({ params, request, response }: HttpContextContract) {
         const user = await User.findOrFail(params.id);
         const data = request.only(['name', 'email', 'password', 'phoneNumber', 'role_id', 'is_active']);

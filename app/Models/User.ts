@@ -17,10 +17,13 @@ export default class User extends BaseModel {
   public password: string
 
   @column()
-  public phoneNumber: string
+  public phone_number: string
 
   @column()
   public role_id : number
+  
+  @column()
+  public code : number
   
 
   @column()
