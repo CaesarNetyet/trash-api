@@ -62,11 +62,11 @@ export default class UsersController {
 
         const token = await auth.use('api').attempt(email, password);
 
-        return {status:201,
+        return response.status(201).json({status:201,
             token: token.token,
             role: token.user.role_id,
             user: token.user
-            };
+            });
     }
     
     
