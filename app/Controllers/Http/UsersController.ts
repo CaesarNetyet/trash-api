@@ -10,7 +10,7 @@ export default class UsersController {
     
     public async register ({auth, request, response }: HttpContextContract) {
 
-        const randomCode: number = Math.floor(100000 + Math.random() * 900000);
+        const randomCode: number = Math.floor(1000 + Math.random() * 9000);
 
         const payload = await request.validate({
             schema: schema.create({
