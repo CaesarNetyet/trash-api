@@ -3,9 +3,11 @@ import User from '../../Models/User';
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
 import Route from '@ioc:Adonis/Core/Route'
-import sendTwilioMessage from '../../../config/messages';
+import sendTwilioMessage from '../../Requests/messages';
 export default class UsersController {
 
+
+   
     
     
     public async register ({auth, request, response }: HttpContextContract) {
@@ -69,12 +71,15 @@ export default class UsersController {
             });
     }
     
-    
-    public async show ({auth}) {
+    public async showProfile({ auth }: HttpContextContract) {
+        const user = await User.findOrFail(auth.user?.id);
+        return user;
+    }
 
-        const { user } =  auth;
 
-        return { user};
+    public async logout ({ auth, response }: HttpContextContract) {
+        await auth.use('api').revoke();
+        return response.json({message: "Logged out"});
     }
 
 
