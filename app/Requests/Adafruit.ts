@@ -15,3 +15,12 @@ export const addCarRequest = async (name: string)=> {
         return [null, error];
     }
 }
+
+export const addSensorRequest = async (name: string, car_key: number)=> {
+    try {
+        const response = await adafruitRequest.post(`feeds/`, {name: name});
+        return [response.data, null];
+    } catch (error) {
+        return [null, error];
+    }
+}

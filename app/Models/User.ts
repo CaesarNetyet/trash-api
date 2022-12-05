@@ -1,9 +1,14 @@
 
 
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import Product from './Product'
 
 export default class User extends BaseModel {
+
+  @manyToMany(()=> Product)
+  public products: ManyToMany<typeof Product>
+
   @column({ isPrimary: true })
   public id: number
 

@@ -40,6 +40,10 @@ Route.get('/', async () => {
 })
 
 
+Route.group(()=> {
+  Route.post('/addcar', 'AdafruitsController.addCar');
+  Route.post('/addsensor', 'AdafruitsController.addSensor');
+}).middleware('auth:api').prefix('adafruit');
 
 Route.group(() => {
   Route.post('verify/:user', 'UsersController.verify').as('verify');
