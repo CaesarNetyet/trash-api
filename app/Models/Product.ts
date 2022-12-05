@@ -13,6 +13,8 @@ export default class Product extends BaseModel {
   @column()
   public name: string
 
+  @column()
+  public adafruit_key: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

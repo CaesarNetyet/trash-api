@@ -60,3 +60,6 @@ Route.post('/testverification', 'UsersController.testVerification');
 
 //Signed URL
 
+Route.post('test', async ({request}) => {
+  return request
+})
