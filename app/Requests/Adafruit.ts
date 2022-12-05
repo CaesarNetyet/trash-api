@@ -9,6 +9,7 @@ const adafruitRequest = axios.create({
 
 export const addCarRequest = async (name: string)=> {
     try {
+        
         const response = await adafruitRequest.post(`groups/`, {name: name});
         return [response.data, null];
     } catch (error) {
@@ -16,9 +17,11 @@ export const addCarRequest = async (name: string)=> {
     }
 }
 
-export const addSensorRequest = async (name: string, car_key: number)=> {
+export const addSensorRequest = async (name: string, group_key: string)=> {
     try {
-        const response = await adafruitRequest.post(`feeds/`, {name: name});
+        const params = new URLSearchParams();
+        params.append('group_key', group_key)
+        const response = await adafruitRequest.post(`feeds/`, {name: name}, {params: params});
         return [response.data, null];
     } catch (error) {
         return [null, error];

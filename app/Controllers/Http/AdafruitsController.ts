@@ -10,7 +10,9 @@ export default class AdafruitsController {
 
     const payload = await request.validate({
       schema: schema.create({
-        car_name: schema.string(),
+        car_name: schema.string([
+            rules.unique({ table: "products", column: "name" })
+        ]),
         sensors: schema.array().members(schema.number()),
       }),
     });
@@ -26,17 +28,15 @@ export default class AdafruitsController {
       });
     }
 
-    const car_key = carData.key;
-
 
     const car = await user.related("products").create({
         name: payload.car_name,
-        adafruit_key: car_key,
+        adafruit_key: carData.key,
     });
 
-    payload.sensors.map(async sensor_id =>{
+    payload.sensors.map(async sensor_id => {
         const sensor = await Sensor.findOrFail(sensor_id);
-        const [sensorData, error] = await addSensorRequest(sensor.name, car_key);
+        const [sensorData, error] = await addSensorRequest(sensor.name, car.adafruit_key);
         if (error) {
             return response.json({
             status: 400,
@@ -44,6 +44,7 @@ export default class AdafruitsController {
             details: error,
             });
         }
+        car.related('sensors').attach([sensor.id])
     })
     return response.json({ status: 201, message: "Cart added" });
   }
