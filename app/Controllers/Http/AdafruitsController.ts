@@ -5,6 +5,10 @@ import User from "App/Models/User";
 import { addCarRequest, addSensorRequest } from "App/Requests/Adafruit";
 
 export default class AdafruitsController {
+
+
+
+
   public async addCar({ request, auth, response }: HttpContextContract) {
     const user = await User.findOrFail(auth.user?.id);
 

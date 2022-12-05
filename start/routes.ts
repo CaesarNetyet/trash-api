@@ -19,6 +19,7 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import Sensor from 'App/Models/Sensor';
 
 Route.get('/', async () => {
   return { '/user': {
@@ -62,4 +63,8 @@ Route.post('/testverification', 'UsersController.testVerification');
 
 Route.post('test', async ({request}) => {
   return request
+})
+
+Route.get('sensors', async()=> {
+  return await Sensor.all()
 })
