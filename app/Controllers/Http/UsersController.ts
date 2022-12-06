@@ -29,10 +29,11 @@ export default class UsersController {
               
             })
         })
+      
         payload.password = await Hash.make(payload.password);
         
         const [messageRequest, error] = await sendTwilioMessage(`Your verification code is ${randomCode}`, payload.phone_number);
-
+       
         if (error) {
             return response.status(403).json({message: "Error sending message", error});
         }

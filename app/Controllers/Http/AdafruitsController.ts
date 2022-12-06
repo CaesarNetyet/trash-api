@@ -49,6 +49,7 @@ export default class AdafruitsController {
             });
         }
         car.related('sensors').attach([sensor.id])
+        console.log(sensorData)
     })
     return response.json({ status: 201, message: "Cart added" });
   }

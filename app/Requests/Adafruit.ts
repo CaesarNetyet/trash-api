@@ -3,7 +3,7 @@ import axios from "axios";
 const adafruitRequest = axios.create({
     baseURL: 'https://io.adafruit.com/api/v2/caesarnetyet/',
     headers: {
-        'X-AIO-Key': 'aio_dLPO66vtXcmERKxAlI4588ZxE76i',
+        'X-AIO-Key': 'aio_hxXd60DzYtJWl6nJ3SRr3yVv83QX',
         'Content-Type': 'application/json'}})
 
 
