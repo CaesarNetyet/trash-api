@@ -44,7 +44,7 @@ export default class UsersController {
             user: user.id,
           },
           {
-            prefixUrl: 'http://trash-api.me:3333'
+            expiresIn: '1 day'
           
           });
 
@@ -80,7 +80,7 @@ export default class UsersController {
 
     public async logout ({ auth, response }: HttpContextContract) {
         await auth.use('api').revoke();
-        return response.json({message: "Logged out"});
+        return response.json({message: "Sesion cerrada"});
     }
 
 
@@ -90,22 +90,13 @@ export default class UsersController {
           }
         const user = await User.findOrFail(params.user);
      
-        if(request.input('code') != user.code) return response.status(403).json({message: "Invalid code"});
+        if(request.input('code') != user.code) return response.status(403).json({message: "Codigo incorrecto"});
         user.is_active = true;
         await user.save();
-        return response.status(201).json({status:201,message: "Phone number verified"});
+        return response.status(201).json({status:201,message: "Numero de telefono verificado"});
     }
 
-    public async testVerification({response}){
-        const [messageRequest, error] = await sendTwilioMessage("Wenas", "8139895086");
-
-        if (error) {
-            return response.status(403).json({message: "Error sending message", error});
-        }
-
-     return response.json({messageRequest});
-
-    }
+ 
     public async update ({ params, request, response }: HttpContextContract) {
         const user = await User.findOrFail(params.id);
         const data = request.only(['name', 'email', 'password', 'phoneNumber', 'role_id', 'is_active']);

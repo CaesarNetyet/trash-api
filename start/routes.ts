@@ -44,7 +44,11 @@ Route.get('/', async () => {
 Route.group(()=> {
   Route.post('/addcar', 'AdafruitsController.addCar');
   Route.post('/addsensor', 'AdafruitsController.addSensor');
-}).middleware('auth:api').prefix('adafruit');
+  Route.delete('/deletecar/:id', 'AdafruitsController.deleteCar');
+  Route.get('/getcars', 'AdafruitsController.getCars');
+  Route.get('/getcar/:id', 'AdafruitsController.getCar');
+  Route.get('getcar/:id/sensors', 'AdafruitsController.getCarSensors');
+}).middleware(['auth:api', 'active']).prefix('adafruit');
 
 Route.group(() => {
   Route.post('verify/:user', 'UsersController.verify').as('verify');
@@ -57,9 +61,7 @@ Route.group(() => {
   }).middleware('auth:api')
    
 }).prefix('user');
-Route.post('/testverification', 'UsersController.testVerification');
 
-//Signed URL
 
 Route.post('test', async ({request}) => {
   return request

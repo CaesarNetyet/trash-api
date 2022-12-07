@@ -27,3 +27,12 @@ export const addSensorRequest = async (name: string, group_key: string)=> {
         return [null, error];
     }
 }
+
+export const deleteCarRequest = async (group_key: string)=> {
+    try {
+        const response = await adafruitRequest.delete(`groups/${group_key}`);
+        return [response.data, null];
+    } catch (error) {
+        return [null, error];
+    }
+}
